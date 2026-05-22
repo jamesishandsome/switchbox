@@ -19,7 +19,10 @@ APP_AUTHOR  := SwitchBox contributors
 APP_VERSION := 0.1.0
 
 ARCH        := -march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIE
+LIBDIRS     := $(PORTLIBS) $(LIBNX)
+
 CFLAGS      := -g -Wall -O2 -ffunction-sections $(ARCH) $(DEFINES)
+CFLAGS      += -D__SWITCH__
 CFLAGS      += $(INCLUDE)
 CXXFLAGS    := $(CFLAGS) -std=gnu++17 -fno-rtti -fno-exceptions
 ASFLAGS     := -g $(ARCH)
@@ -47,13 +50,22 @@ CPPFILES    := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES      := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 BINFILES    := $(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 
+ifeq ($(strip $(CPPFILES)),)
+export LD := $(CC)
+else
+export LD := $(CXX)
+endif
+
 export OFILES_BIN := $(addsuffix .o,$(BINFILES))
 export OFILES_SRC := $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 export OFILES := $(OFILES_BIN) $(OFILES_SRC)
+export HFILES_BIN := $(addsuffix .h,$(subst .,_,$(BINFILES)))
 
 export INCLUDE := $(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
+                  $(foreach dir,$(LIBDIRS),-I$(dir)/include) \
                   $(foreach dir,$(SOURCES),-I$(CURDIR)/$(dir)) \
                   -I$(CURDIR)/$(BUILD)
+export LIBPATHS := $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
 .PHONY: all clean run
 
@@ -74,8 +86,11 @@ else
 
 DEPENDS := $(OFILES:.o=.d)
 
+all: $(OUTPUT).nro
+
 $(OUTPUT).nro: $(OUTPUT).elf
 $(OUTPUT).elf: $(OFILES)
+$(OFILES_SRC): $(HFILES_BIN)
 
 -include $(DEPENDS)
 
