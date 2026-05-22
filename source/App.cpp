@@ -150,12 +150,14 @@ bool App::openSelected() {
             currentSiteIndex_ = selected_;
             currentVodPage_ = 1;
             const auto& site = config_.sites()[currentSiteIndex_];
+            page_ = Page::VodList;
+            selected_ = 0;
+            vodItems_.clear();
+            status_ = "Opening source: " + site.name;
             if (!client_.fetchVodList(site, currentVodPage_, searchQuery_, "", vodItems_, error)) {
                 status_ = "Source fetch failed: " + error;
                 return false;
             }
-            page_ = Page::VodList;
-            selected_ = 0;
             status_ = "Loaded " + std::to_string(vodItems_.size()) + " items from " + site.name;
             return true;
         }
@@ -416,6 +418,11 @@ void App::renderVodList() const {
         std::printf("%c %02d. %s\n", i == selected_ ? '>' : ' ', i + 1, item.title.c_str());
         if (!item.remarks.empty()) std::printf("      %s\n", item.remarks.c_str());
         i++;
+    }
+    if (vodItems_.empty()) {
+        std::printf("  (no items loaded)\n");
+        std::printf("  If this source is type=3/CSP/Spider, use Companion resolve mode or choose a normal VOD API source.\n");
+        std::printf("  Press B to return, Y to search/retry, or X to reload config.\n");
     }
 }
 
