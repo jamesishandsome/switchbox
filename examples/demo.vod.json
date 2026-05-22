@@ -1,0 +1,26 @@
+{
+  "page": 1,
+  "pagecount": 1,
+  "limit": 20,
+  "total": 2,
+  "list": [
+    {
+      "vod_id": "demo-001",
+      "vod_name": "Demo Movie",
+      "vod_pic": "https://example.invalid/poster/demo-001.jpg",
+      "vod_remarks": "Direct MP4 placeholder",
+      "type_name": "Demo",
+      "vod_content": "A local demo item showing TVBox JSON list/detail parsing.",
+      "vod_play_from": "Direct",
+      "vod_play_url": "Episode 1$https://example.invalid/media/demo-001.mp4#Episode 2$https://example.invalid/media/demo-002.mp4"
+    },
+    {
+      "vod_id": "demo-002",
+      "vod_name": "Demo HLS Channel",
+      "vod_remarks": "HLS placeholder",
+      "type_name": "Demo",
+      "vod_play_from": "HLS",
+      "vod_play_url": "Live$https://example.invalid/live/demo.m3u8"
+    }
+  ]
+}

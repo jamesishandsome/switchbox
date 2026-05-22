@@ -1,0 +1,15 @@
+build/
+.omx/
+*.elf
+*.nro
+*.nacp
+*.nso
+*.map
+*.d
+*.o
+.cache/
+.tmp*/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

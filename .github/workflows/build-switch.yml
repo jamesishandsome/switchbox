@@ -1,0 +1,44 @@
+name: Build SwitchBox
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-switch:
+    runs-on: ubuntu-latest
+    container: devkitpro/devkita64:20260219
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate examples
+        run: |
+          if command -v python3 >/dev/null 2>&1; then
+            python3 tools/validate_examples.py
+            python3 tools/validate_companion.py
+          elif command -v python >/dev/null 2>&1; then
+            python tools/validate_examples.py
+            python tools/validate_companion.py
+          else
+            echo "Python not available; skipping host-side example validator"
+          fi
+          if command -v ffmpeg >/dev/null 2>&1; then
+            if command -v python3 >/dev/null 2>&1; then
+              python3 tools/validate_ffmpeg_transcode.py
+            elif command -v python >/dev/null 2>&1; then
+              python tools/validate_ffmpeg_transcode.py
+            fi
+          else
+            echo "ffmpeg not available; skipping transcode smoke test"
+          fi
+
+      - name: Build NRO
+        run: make
+
+      - name: Upload NRO
+        uses: actions/upload-artifact@v4
+        with:
+          name: switchbox-nro
+          path: switchbox.nro
