@@ -34,10 +34,6 @@ jobs:
             echo "ffmpeg not available; skipping transcode smoke test"
           fi
 
-      - name: Install Switch networking portlibs
-        run: |
-          pacman -Sy --noconfirm switch-curl switch-mbedtls switch-zlib
-
       - name: Build NRO
         run: make
 
